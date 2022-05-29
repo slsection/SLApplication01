@@ -2,7 +2,9 @@ package com.example.slapplication01;
 
 import android.Manifest;
 import android.content.Context;
+import android.os.Build;
 import android.os.Environment;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -28,21 +30,24 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final long START_TIME = 180000;
+    private static final long START_TIME = 10800000;
 
     private  TextView mTextViewCountDown;
     private  Button mButtonStartPause;
     private  Button getmButtonReset;
     private  Button getmButtonFinish;
+    private  Button getmButtonTran;
     private  CountDownTimer mCountDownTimer;
     private  boolean mTimerRunning;
+    private  boolean mIsPause;
     private long mTimeLeftInMillis = START_TIME;
+    private long mStopTime = 0;
     private static int PERMISSIONS_REQUEST_READ_PHONE_STATE = 1;
 
     File audiofile = null;
 
     final static String FILENAME = "test.mp3";
-    MediaRecorder recorder = null;
+    private MediaRecorder recorder = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,9 +58,11 @@ public class MainActivity extends AppCompatActivity {
         mButtonStartPause = findViewById(R.id.button_start_pause);
         getmButtonReset = findViewById(R.id.buttonreset);
         getmButtonFinish = findViewById(R.id.finish);
+        getmButtonTran = findViewById(R.id.button_tran);
 
         getmButtonReset.setVisibility(View.INVISIBLE);
         getmButtonFinish.setVisibility(View.INVISIBLE);
+        getmButtonTran.setVisibility(View.INVISIBLE);
 
         Context context = getApplicationContext();
         audiofile = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), FILENAME);
@@ -69,19 +76,29 @@ public class MainActivity extends AppCompatActivity {
 
         // クリックイベント：開始 or 一時停止
         mButtonStartPause.setOnClickListener(new View.OnClickListener(){
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onClick(View v) {
                 System.out.println("mTimerRunningの値は？ " +mTimerRunning);
                 if (mTimerRunning) {
                     // タイマーが動いてたら
-                    // 録音(一時)停止
-                    recorder.stop();
-                    recorder.release();
+                    // 録音一時停止
+                    recorder.pause();
                     pauseTimer();
+                    mIsPause = true;
                 } else {
                     // タイマーが動いてなかったら
-                    // startTimer()の中で録音開始
-                    startTimer();
+                    if (mIsPause){
+                        // 一時停止中の場合
+                        // 録音再開
+                        recorder.resume();
+                        resumeTimer();
+                        mIsPause = false;
+                    }else{
+                        // 初回の場合
+                        // startTimer()の中で録音開始
+                        startTimer();
+                    }
                 }
             }
         });
@@ -93,23 +110,44 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println("ストップボタン" +mTimerRunning);
                 if (mTimerRunning) {
                     // タイマーが動いてたら
+                    mCountDownTimer.cancel();
+                    mTimerRunning = false;
                     // 録音停止
                     recorder.stop();
                     recorder.release();
-                    mCountDownTimer.cancel();
-                    mTimerRunning = false;
-                    mTimeLeftInMillis = START_TIME;
-                    updateCountDownText();
-                    mButtonStartPause.setText("START");
-                    mButtonStartPause.setVisibility(View.VISIBLE);
-                    getmButtonReset.setVisibility(View.INVISIBLE);
-                    getmButtonFinish.setVisibility(View.INVISIBLE);
-                    // S3に録音ファイルを転送
-                    uploadToS3(FILENAME, audiofile.getAbsolutePath());
+                    recorder = null;
+//                    // S3に録音ファイルを転送
+//                    uploadToS3(FILENAME, audiofile.getAbsolutePath());
+//                    //
+//                    mTimeLeftInMillis = START_TIME;
+//                    updateCountDownText();
+//                    mButtonStartPause.setText("START");
+//                    mButtonStartPause.setVisibility(View.VISIBLE);
+//                    getmButtonReset.setVisibility(View.INVISIBLE);
+//                    getmButtonFinish.setVisibility(View.INVISIBLE);
+
+                    getmButtonTran.setVisibility(View.VISIBLE);
                 } else {
                     // タイマーが動いてなかったら
                     // ・・・
                 }
+            }
+        });
+
+        // クリックイベント：文字起こし
+        getmButtonTran.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // S3に録音ファイルを転送
+                uploadToS3(FILENAME, audiofile.getAbsolutePath());
+                // 画面表示更新
+                mTimeLeftInMillis = START_TIME;
+                updateCountDownText();
+                mButtonStartPause.setText("START");
+                mButtonStartPause.setVisibility(View.VISIBLE);
+                getmButtonReset.setVisibility(View.INVISIBLE);
+                getmButtonFinish.setVisibility(View.INVISIBLE);
+                getmButtonTran.setVisibility(View.INVISIBLE);
             }
         });
 
@@ -163,8 +201,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void pauseTimer(){
+        mStopTime = mTimeLeftInMillis;
         mCountDownTimer.cancel();
         mTimerRunning = false;
+        mButtonStartPause.setText("START");
+        getmButtonReset.setVisibility(View.VISIBLE);
+    }
+    private void resumeTimer(){
+        mTimeLeftInMillis = mStopTime;
+        updateCountDownText();
+        // ★初期値から開始してしまう　カウントダウンと録音のイベントは分けた方がいいかも
+        mCountDownTimer.start();
+        mTimerRunning = true;
         mButtonStartPause.setText("START");
         getmButtonReset.setVisibility(View.VISIBLE);
     }
@@ -177,21 +225,28 @@ public class MainActivity extends AppCompatActivity {
         mButtonStartPause.setVisibility(View.VISIBLE);
         getmButtonReset.setVisibility(View.INVISIBLE);
         getmButtonFinish.setVisibility(View.INVISIBLE);
+        getmButtonTran.setVisibility(View.INVISIBLE);
     }
 
     private void updateCountDownText(){
-        int minutes = (int)(mTimeLeftInMillis/1000)/60;
+        int hour    = (int)(mTimeLeftInMillis/1000)/60/60;
+        int minutes = (int)(mTimeLeftInMillis/1000)/60%60;
         int seconds = (int)(mTimeLeftInMillis/1000)%60;
-        String timerLeftFormatted = String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds);
+        String timerLeftFormatted = String.format(
+                Locale.getDefault(),
+                "%02d:%02d:%02d",
+                hour,
+                minutes,
+                seconds);
         mTextViewCountDown.setText(timerLeftFormatted);
     }
 
     // 録音ファイル転送処理
     private void uploadToS3(String p_fileName, String p_path){
         // S3関連の設定
-        String accessKey = "AKIAZ4U7UPY4QXCTUVVB";                  // アクセスキー
-        String secKey = "4UwlXpmzNdCy80/tvtuIp45GJIBY2SRcdu0bjN6g"; // シークレットキー
-        String bucket = "slaplication01-in";                        // バケット名
+        String accessKey = "AKIAXNTP42QDGJ3KUL5E";                  // アクセスキー
+        String secKey = "1ucXtBRV1+XUwuWqFUGMRTE0IGWY+4gtRaxae6hZ"; // シークレットキー
+        String bucket = "slaplication01-in-test";                        // バケット名
 
         // 認証情報の作成
         BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(accessKey, secKey);
