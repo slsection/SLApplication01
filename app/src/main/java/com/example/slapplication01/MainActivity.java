@@ -244,9 +244,9 @@ public class MainActivity extends AppCompatActivity {
     // 録音ファイル転送処理
     private void uploadToS3(String p_fileName, String p_path){
         // S3関連の設定
-        String accessKey = "AKIAXNTP42QDGJ3KUL5E";                  // アクセスキー
-        String secKey = "1ucXtBRV1+XUwuWqFUGMRTE0IGWY+4gtRaxae6hZ"; // シークレットキー
-        String bucket = "slaplication01-in-test";                        // バケット名
+        String accessKey = "******";                // アクセスキー
+        String secKey = "******";                   // シークレットキー
+        String bucket = "slaplication01-in";        // バケット名
 
         // 認証情報の作成
         BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(accessKey, secKey);
