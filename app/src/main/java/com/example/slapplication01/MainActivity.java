@@ -1,12 +1,20 @@
 package com.example.slapplication01;
 
+import android.Manifest;
+import android.content.Context;
+import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Button;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.Locale;
+import android.media.MediaRecorder;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -15,9 +23,16 @@ public class MainActivity extends AppCompatActivity {
     private  TextView mTextViewCountDown;
     private  Button mButtonStartPause;
     private  Button getmButtonReset;
+    private  Button getmButtonFinish;
     private  CountDownTimer mCountDownTimer;
     private  boolean mTimerRunning;
     private long mTimeLeftInMillis = START_TIME;
+    private static int PERMISSIONS_REQUEST_READ_PHONE_STATE = 1;
+
+    File audiofile = null;
+
+    final static String FILENAME = "test.mp3";
+    MediaRecorder recorder = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,14 +42,53 @@ public class MainActivity extends AppCompatActivity {
         mTextViewCountDown = findViewById(R.id.text_view_countdown);
         mButtonStartPause = findViewById(R.id.button_start_pause);
         getmButtonReset = findViewById(R.id.buttonreset);
+        getmButtonFinish = findViewById(R.id.finish);
+
+        getmButtonReset.setVisibility(View.INVISIBLE);
+        getmButtonFinish.setVisibility(View.INVISIBLE);
+
+        Context context = getApplicationContext();
+        audiofile = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), FILENAME);
+
+        ActivityCompat.requestPermissions(
+                MainActivity.this,
+                new String[] { Manifest.permission.RECORD_AUDIO },
+                PERMISSIONS_REQUEST_READ_PHONE_STATE);
+
+        recorder = new MediaRecorder();
+
 
         mButtonStartPause.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+                System.out.println("mTimerRunningの値は？ " +mTimerRunning);
                 if (mTimerRunning) {
+                    recorder.stop();
+                    recorder.release();
                     pauseTimer();
                 } else {
                     startTimer();
+                }
+            }
+        });
+
+        getmButtonFinish.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                System.out.println("ストップボタン" +mTimerRunning);
+                if (mTimerRunning) {
+                    recorder.stop();
+                    recorder.release();
+                    mCountDownTimer.cancel();
+                    mTimerRunning = false;
+                    mTimeLeftInMillis = START_TIME;
+                    updateCountDownText();
+                    mButtonStartPause.setText("START");
+                    mButtonStartPause.setVisibility(View.VISIBLE);
+                    getmButtonReset.setVisibility(View.INVISIBLE);
+                    getmButtonFinish.setVisibility(View.INVISIBLE);
+                } else {
+
                 }
             }
         });
@@ -45,9 +99,8 @@ public class MainActivity extends AppCompatActivity {
                 resetTimer();
             }
         });
-
-        updateCountDownText();
     }
+
 
     private void startTimer(){
         mCountDownTimer = new CountDownTimer(mTimeLeftInMillis,1000) {
@@ -55,6 +108,22 @@ public class MainActivity extends AppCompatActivity {
             public void onTick(long millisUntilFinished) {
                 mTimeLeftInMillis = millisUntilFinished;
                 updateCountDownText();
+
+                recorder = new MediaRecorder();
+                recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+                recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+                recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+                recorder.setOutputFile(audiofile.getAbsolutePath());
+                System.out.println("パス " +audiofile.getAbsolutePath());
+                try {
+                    recorder.prepare();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                recorder.start();
+
+                getmButtonReset.setVisibility(View.VISIBLE);
+                getmButtonFinish.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -78,10 +147,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void resetTimer(){
+        mCountDownTimer.cancel();
         mTimeLeftInMillis = START_TIME;
         updateCountDownText();
+        mButtonStartPause.setText("START");
         mButtonStartPause.setVisibility(View.VISIBLE);
         getmButtonReset.setVisibility(View.INVISIBLE);
+        getmButtonFinish.setVisibility(View.INVISIBLE);
     }
 
     private void updateCountDownText(){

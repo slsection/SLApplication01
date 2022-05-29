@@ -39,8 +39,20 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button_start_pause"
-        tools:visibility="visible"
+        tools:visibility="invisible"
         tools:ignore="HardcodedText" />
 
+    <Button
+        android:id="@+id/finish"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/Finish"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonreset"
+        tools:visibility="invisible"
+        tools:ignore="HardcodedText" />
 
 </android.support.constraint.ConstraintLayout>
