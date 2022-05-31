@@ -96,6 +96,20 @@ public class MainActivity extends AppCompatActivity {
                         mIsPause = false;
                     }else{
                         // 初回の場合
+                        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+                        recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+                        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+                        recorder.setOutputFile(audiofile.getAbsolutePath());
+                        System.out.println("パス " +audiofile.getAbsolutePath());
+                        // 録音準備
+                        try {
+                            recorder.prepare();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        // 録音開始
+                        recorder.start();
+
                         // startTimer()の中で録音開始
                         startTimer();
                     }
@@ -168,21 +182,6 @@ public class MainActivity extends AppCompatActivity {
                 mTimeLeftInMillis = millisUntilFinished;
                 updateCountDownText();
 
-                recorder = new MediaRecorder();
-                recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-                recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-                recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-                recorder.setOutputFile(audiofile.getAbsolutePath());
-                System.out.println("パス " +audiofile.getAbsolutePath());
-                // 録音準備
-                try {
-                    recorder.prepare();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                // 録音開始
-                recorder.start();
-
                 getmButtonReset.setVisibility(View.VISIBLE);
                 getmButtonFinish.setVisibility(View.VISIBLE);
             }
@@ -210,7 +209,6 @@ public class MainActivity extends AppCompatActivity {
     private void resumeTimer(){
         mTimeLeftInMillis = mStopTime;
         updateCountDownText();
-        // ★初期値から開始してしまう　カウントダウンと録音のイベントは分けた方がいいかも
         mCountDownTimer.start();
         mTimerRunning = true;
         mButtonStartPause.setText("START");
