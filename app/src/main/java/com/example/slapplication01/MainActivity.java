@@ -176,6 +176,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void startTimer(){
+        if(mStopTime!=0){
+            mTimeLeftInMillis = mStopTime;
+        }
         mCountDownTimer = new CountDownTimer(mTimeLeftInMillis,1000) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -209,6 +212,7 @@ public class MainActivity extends AppCompatActivity {
     private void resumeTimer(){
         mTimeLeftInMillis = mStopTime;
         updateCountDownText();
+        startTimer();
         mCountDownTimer.start();
         mTimerRunning = true;
         mButtonStartPause.setText("START");
