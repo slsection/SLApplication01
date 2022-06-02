@@ -20,6 +20,8 @@ import android.media.MediaRecorder;
 
 //AWS_S3アップロード関連で必要なライブラリ
 import android.util.Log;
+import android.widget.Toast;
+
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.mobile.client.AWSMobileClient;
@@ -46,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
     File audiofile = null;
 
-    final static String FILENAME = "test.mp3";
+    final static String FILENAME = "test-kawa.mp3";
     private MediaRecorder recorder = null;
 
     @Override
@@ -60,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         getmButtonFinish = findViewById(R.id.finish);
         getmButtonTran = findViewById(R.id.button_tran);
 
+        mTextViewCountDown.setText("03:00:00");
         getmButtonReset.setVisibility(View.INVISIBLE);
         getmButtonFinish.setVisibility(View.INVISIBLE);
         getmButtonTran.setVisibility(View.INVISIBLE);
@@ -122,29 +125,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 System.out.println("ストップボタン" +mTimerRunning);
-                if (mTimerRunning) {
-                    // タイマーが動いてたら
-                    mCountDownTimer.cancel();
-                    mTimerRunning = false;
-                    // 録音停止
-                    recorder.stop();
-                    recorder.release();
-                    recorder = null;
-//                    // S3に録音ファイルを転送
-//                    uploadToS3(FILENAME, audiofile.getAbsolutePath());
-//                    //
-//                    mTimeLeftInMillis = START_TIME;
-//                    updateCountDownText();
-//                    mButtonStartPause.setText("START");
-//                    mButtonStartPause.setVisibility(View.VISIBLE);
-//                    getmButtonReset.setVisibility(View.INVISIBLE);
-//                    getmButtonFinish.setVisibility(View.INVISIBLE);
-
-                    getmButtonTran.setVisibility(View.VISIBLE);
-                } else {
-                    // タイマーが動いてなかったら
-                    // ・・・
-                }
+                // タイマー停止
+                mCountDownTimer.cancel();
+                mTimerRunning = false;
+                // 録音停止
+                recorder.stop();
+                recorder.release();
+                recorder = null;
+                // S3に録音ファイルを転送
+                uploadToS3(FILENAME, audiofile.getAbsolutePath());
+//                getmButtonTran.setVisibility(View.VISIBLE);
             }
         });
 
@@ -152,16 +142,11 @@ public class MainActivity extends AppCompatActivity {
         getmButtonTran.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // S3に録音ファイルを転送
-                uploadToS3(FILENAME, audiofile.getAbsolutePath());
-                // 画面表示更新
-                mTimeLeftInMillis = START_TIME;
-                updateCountDownText();
-                mButtonStartPause.setText("START");
-                mButtonStartPause.setVisibility(View.VISIBLE);
-                getmButtonReset.setVisibility(View.INVISIBLE);
-                getmButtonFinish.setVisibility(View.INVISIBLE);
-                getmButtonTran.setVisibility(View.INVISIBLE);
+//                // S3に録音ファイルを転送
+//                uploadToS3(FILENAME, audiofile.getAbsolutePath());
+//                // 画面表示更新
+//                resetTimer();
+//                getmButtonTran.setVisibility(View.INVISIBLE);
             }
         });
 
@@ -169,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
         getmButtonReset.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
+                mCountDownTimer.cancel();
                 resetTimer();
             }
         });
@@ -198,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
         }.start();
 
         mTimerRunning = true;
-        mButtonStartPause.setText("一時停止");
+        mButtonStartPause.setText("PAUSE");
         getmButtonReset.setVisibility(View.INVISIBLE);
     }
 
@@ -206,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
         mStopTime = mTimeLeftInMillis;
         mCountDownTimer.cancel();
         mTimerRunning = false;
-        mButtonStartPause.setText("START");
+        mButtonStartPause.setText("RESTART");
         getmButtonReset.setVisibility(View.VISIBLE);
     }
     private void resumeTimer(){
@@ -220,14 +206,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void resetTimer(){
-        mCountDownTimer.cancel();
         mTimeLeftInMillis = START_TIME;
         updateCountDownText();
         mButtonStartPause.setText("START");
         mButtonStartPause.setVisibility(View.VISIBLE);
         getmButtonReset.setVisibility(View.INVISIBLE);
         getmButtonFinish.setVisibility(View.INVISIBLE);
-        getmButtonTran.setVisibility(View.INVISIBLE);
+//        getmButtonTran.setVisibility(View.INVISIBLE);
     }
 
     private void updateCountDownText(){
@@ -269,16 +254,28 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onStateChanged(int id, TransferState state) {
                 Log.d("uploadToS3", "status: " + state);
+                if(state.toString().equals("COMPLETED"))
+                {
+                    Toast.makeText(MainActivity.this,
+                            "音声ファイル転送完了\n文字起こし完了メールをお待ちください",
+                            Toast.LENGTH_LONG).show();
+                    resetTimer();
+                }
             }
             // 転送中
             @Override
             public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
-                Log.d("uploadToS3", "progress: "+id+" bytesCurrent:"+bytesCurrent+" bytesTotal:"+bytesTotal);
+                Log.d("uploadToS3",
+                        "progress: "+id+" bytesCurrent:"+bytesCurrent+" bytesTotal:"+bytesTotal);
             }
             // 異常終了
             @Override
             public void onError(int id, Exception ex) {
                 ex.printStackTrace();
+                Toast.makeText(MainActivity.this,
+                        "音声ファイル転送失敗",
+                        Toast.LENGTH_LONG).show();
+                resetTimer();
             }
         });
     }
