@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
     File audiofile = null;
 
-    final static String FILENAME = "test-kawa.mp3";
+    final static String FILENAME = "test-kawa2.mp3";
     private MediaRecorder recorder = null;
 
     @Override
@@ -116,6 +116,8 @@ public class MainActivity extends AppCompatActivity {
                         // startTimer()の中で録音開始
                         startTimer();
                     }
+                    getmButtonReset.setVisibility(View.VISIBLE);
+                    getmButtonFinish.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -165,14 +167,14 @@ public class MainActivity extends AppCompatActivity {
         if(mStopTime!=0){
             mTimeLeftInMillis = mStopTime;
         }
+        else {
+            mTimeLeftInMillis = START_TIME;
+        }
         mCountDownTimer = new CountDownTimer(mTimeLeftInMillis,1000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 mTimeLeftInMillis = millisUntilFinished;
                 updateCountDownText();
-
-                getmButtonReset.setVisibility(View.VISIBLE);
-                getmButtonFinish.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -194,19 +196,22 @@ public class MainActivity extends AppCompatActivity {
         mTimerRunning = false;
         mButtonStartPause.setText("RESTART");
         getmButtonReset.setVisibility(View.VISIBLE);
+        getmButtonFinish.setVisibility(View.VISIBLE);
     }
+
     private void resumeTimer(){
         mTimeLeftInMillis = mStopTime;
         updateCountDownText();
         startTimer();
         mCountDownTimer.start();
         mTimerRunning = true;
-        mButtonStartPause.setText("START");
+        mButtonStartPause.setText("PAUSE");
         getmButtonReset.setVisibility(View.VISIBLE);
     }
 
     private void resetTimer(){
         mTimeLeftInMillis = START_TIME;
+        mStopTime = 0;
         updateCountDownText();
         mButtonStartPause.setText("START");
         mButtonStartPause.setVisibility(View.VISIBLE);
