@@ -22,9 +22,9 @@ import android.media.MediaRecorder;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.mobile.client.AWSMobileClient;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
     File audiofile = null;
 
-    final static String FILENAME = "test-kawa2.mp3";
+    final static String FILENAME = "test-cognito.mp3";
     private MediaRecorder recorder = null;
 
     @Override
@@ -236,15 +236,17 @@ public class MainActivity extends AppCompatActivity {
     // 録音ファイル転送処理
     private void uploadToS3(String p_fileName, String p_path){
         // S3関連の設定
-        String accessKey = "******";                // アクセスキー
-        String secKey = "******";                   // シークレットキー
-        String bucket = "slaplication01-in";        // バケット名
+       String bucket = "slaplication01-in";        // バケット名
 
-        // 認証情報の作成
-        BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(accessKey, secKey);
+        // Amazon Cognito 認証情報プロバイダーを初期化
+        CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
+                getApplicationContext(),
+                "ap-northeast-1:2e5a8f36-24bb-400c-a102-75765164a6d9", // ID プールの ID
+                Regions.AP_NORTHEAST_1 // リージョン
+            );
 
         // 作成した認証情報でクライアント接続用オブジェクトを作成
-        AmazonS3Client s3Client = new AmazonS3Client(basicAWSCredentials);
+        AmazonS3Client s3Client = new AmazonS3Client(credentialsProvider);
         TransferUtility transferUtility = new TransferUtility(s3Client, getApplicationContext());
 
         // ファイルを指定してアップロードを行う
