@@ -10,6 +10,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.View;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Button;
 
@@ -29,15 +31,21 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity<context> extends AppCompatActivity {
 
     private static final long START_TIME = 10800000;
 
     private  TextView mTextViewCountDown;
-    private  Button mButtonStartPause;
-    private  Button getmButtonReset;
-    private  Button getmButtonFinish;
+//    private  Button mButtonStartPause;
+    private  ImageButton mButtonStart;
+    private  ImageButton mButtonPause;
+    //    private  Button getmButtonReset;
+    private  ImageButton getmButtonReset2;
+//    private  Button getmButtonFinish;
+    private  ImageButton getmButtonFinish2;
     private  Button getmButtonTran;
     private  CountDownTimer mCountDownTimer;
     private  boolean mTimerRunning;
@@ -57,14 +65,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mTextViewCountDown = findViewById(R.id.text_view_countdown);
-        mButtonStartPause = findViewById(R.id.button_start_pause);
-        getmButtonReset = findViewById(R.id.buttonreset);
-        getmButtonFinish = findViewById(R.id.finish);
+        mButtonStart = findViewById(R.id.imagebutton_restart);
+        mButtonPause = findViewById(R.id.imagebutton_pause);
+        getmButtonReset2 = findViewById(R.id.imagebutton_reset);
+        getmButtonFinish2 = findViewById(R.id.imagebutton_finish);
         getmButtonTran = findViewById(R.id.button_tran);
 
         mTextViewCountDown.setText("03:00:00");
-        getmButtonReset.setVisibility(View.INVISIBLE);
-        getmButtonFinish.setVisibility(View.INVISIBLE);
+        getmButtonReset2.setVisibility(View.INVISIBLE);
+        getmButtonFinish2.setVisibility(View.INVISIBLE);
         getmButtonTran.setVisibility(View.INVISIBLE);
 
         Context context = getApplicationContext();
@@ -78,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         recorder = new MediaRecorder();
 
         // クリックイベント：開始 or 一時停止
-        mButtonStartPause.setOnClickListener(new View.OnClickListener(){
+        mButtonStart.setOnClickListener(new View.OnClickListener(){
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onClick(View v) {
@@ -120,8 +129,51 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        mButtonPause.setOnClickListener(new View.OnClickListener(){
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onClick(View v) {
+                System.out.println("mTimerRunningの値は？ " +mTimerRunning);
+                if (mTimerRunning) {
+                    // タイマーが動いてたら
+                    // 録音一時停止
+                    recorder.pause();
+                    pauseTimer();
+                    mIsPause = true;
+                } else {
+                    // タイマーが動いてなかったら
+                    if (mIsPause){
+                        // 一時停止中の場合
+                        // 録音再開
+                        recorder.resume();
+                        resumeTimer();
+                        mIsPause = false;
+                    }else{
+                        // 初回の場合
+                        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+                        recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+                        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+                        recorder.setOutputFile(audiofile.getAbsolutePath());
+                        System.out.println("パス " +audiofile.getAbsolutePath());
+                        // 録音準備
+                        try {
+                            recorder.prepare();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        // 録音開始
+                        recorder.start();
+
+                        // startTimer()の中で録音開始
+                        startTimer();
+                    }
+                }
+            }
+        });
+
+
         // クリックイベント：停止
-        getmButtonFinish.setOnClickListener(new View.OnClickListener(){
+        getmButtonFinish2.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
                 System.out.println("ストップボタン" +mTimerRunning);
@@ -134,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
                 recorder = null;
                 // S3に録音ファイルを転送
                 uploadToS3(FILENAME, audiofile.getAbsolutePath());
-//                getmButtonTran.setVisibility(View.VISIBLE);
+                getmButtonTran.setVisibility(View.VISIBLE);
             }
         });
 
@@ -151,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // クリックイベント：リセット
-        getmButtonReset.setOnClickListener(new View.OnClickListener(){
+        getmButtonReset2.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
                 mCountDownTimer.cancel();
@@ -171,29 +223,38 @@ public class MainActivity extends AppCompatActivity {
                 mTimeLeftInMillis = millisUntilFinished;
                 updateCountDownText();
 
-                getmButtonReset.setVisibility(View.VISIBLE);
-                getmButtonFinish.setVisibility(View.VISIBLE);
+                mButtonStart.setVisibility(View.INVISIBLE);
+                mButtonPause.setVisibility(View.VISIBLE);
+                getmButtonReset2.setVisibility(View.VISIBLE);
+                getmButtonFinish2.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onFinish() {
                 mTimerRunning = false;
-                mButtonStartPause.setText("START");
-                getmButtonReset.setVisibility(View.INVISIBLE);
+//                mButtonStartParse.setText("START");
+                mButtonPause.setVisibility(View.INVISIBLE);
+                getmButtonReset2.setVisibility(View.INVISIBLE);
             }
         }.start();
 
         mTimerRunning = true;
-        mButtonStartPause.setText("PAUSE");
-        getmButtonReset.setVisibility(View.INVISIBLE);
+//        mButtonStartPause.setText("PAUSE");
+        mButtonStart.setVisibility(View.INVISIBLE);
+        mButtonPause.setVisibility(View.VISIBLE);
+        getmButtonReset2.setVisibility(View.INVISIBLE);
+        getmButtonFinish2.setVisibility(View.INVISIBLE);
     }
 
     private void pauseTimer(){
         mStopTime = mTimeLeftInMillis;
         mCountDownTimer.cancel();
         mTimerRunning = false;
-        mButtonStartPause.setText("RESTART");
-        getmButtonReset.setVisibility(View.VISIBLE);
+//        mButtonStartPause.setText("RESTART");
+        mButtonStart.setVisibility(View.VISIBLE);
+        mButtonPause.setVisibility(View.INVISIBLE);
+        getmButtonReset2.setVisibility(View.VISIBLE);
+        getmButtonFinish2.setVisibility(View.VISIBLE);
     }
     private void resumeTimer(){
         mTimeLeftInMillis = mStopTime;
@@ -201,18 +262,20 @@ public class MainActivity extends AppCompatActivity {
         startTimer();
         mCountDownTimer.start();
         mTimerRunning = true;
-        mButtonStartPause.setText("START");
-        getmButtonReset.setVisibility(View.VISIBLE);
+//        mButtonStartPause.setText("START");
+        mButtonStart.setVisibility(View.VISIBLE);
+        mButtonPause.setVisibility(View.INVISIBLE);
+        getmButtonReset2.setVisibility(View.VISIBLE);
     }
 
     private void resetTimer(){
         mTimeLeftInMillis = START_TIME;
         updateCountDownText();
-        mButtonStartPause.setText("START");
-        mButtonStartPause.setVisibility(View.VISIBLE);
-        getmButtonReset.setVisibility(View.INVISIBLE);
-        getmButtonFinish.setVisibility(View.INVISIBLE);
-//        getmButtonTran.setVisibility(View.INVISIBLE);
+//        mButtonStartPause.setText("START");
+        mButtonStart.setVisibility(View.VISIBLE);
+        getmButtonReset2.setVisibility(View.INVISIBLE);
+        getmButtonFinish2.setVisibility(View.INVISIBLE);
+        getmButtonTran.setVisibility(View.INVISIBLE);
     }
 
     private void updateCountDownText(){
@@ -279,4 +342,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    ImageView matchImage = findViewById(R.id.image_view);
+    GlideDrawableImageViewTarget target = new GlideDrawableImageViewTarget(matchImage,1);
+    Glide.with(context).load(R.raw.gif).into(target);
+
 }
