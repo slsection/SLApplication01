@@ -326,8 +326,8 @@ public class MainActivity  extends AppCompatActivity {
         getmButtonFinish.setEnabled(false);
         // メッセージ表示
         Toast.makeText(MainActivity.this,
-                "録音時間終了\n文字起こし開始します",
-                Toast.LENGTH_LONG).show();
+                "録音終了\n文字起こし開始します",
+                Toast.LENGTH_SHORT).show();
     }
     // 転送後処理
     private void postUpload(){
