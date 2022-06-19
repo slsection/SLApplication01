@@ -6,11 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <ImageView
-        android:id="@+id/image_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
     <TextView
         android:id="@+id/text_view_countdown"
         android:layout_width="wrap_content"
@@ -22,64 +17,6 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-<!--    <Button-->
-<!--        android:id="@+id/button_start_pause"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginStart="15dp"-->
-<!--        android:layout_marginTop="72dp"-->
-<!--        android:layout_marginEnd="15dp"-->
-<!--        android:text="@string/Start"-->
-<!--        app:layout_constraintEnd_toStartOf="@+id/finish"-->
-<!--        app:layout_constraintStart_toEndOf="@+id/buttonreset"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/text_view_countdown" />-->
-
-<!--    <ImageButton-->
-<!--        android:id="@+id/imagebutton_start"-->
-<!--        android:layout_width="50dp"-->
-<!--        android:layout_height="50dp"-->
-<!--        android:layout_marginStart="15dp"-->
-<!--        android:layout_marginTop="72dp"-->
-<!--        android:layout_marginEnd="15dp"-->
-<!--        android:padding="0dp"-->
-<!--        android:scaleType="fitCenter"-->
-<!--        android:src="@drawable/start"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintHorizontal_bias="0.498"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        tools:layout_editor_absoluteY="451dp" />-->
-
-    <!--    <Button-->
-<!--        android:id="@+id/buttonreset"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginTop="72dp"-->
-<!--        android:layout_marginEnd="15dp"-->
-<!--        android:text="@string/Stop"-->
-<!--        app:layout_constraintEnd_toStartOf="@+id/button_start_pause"-->
-<!--        app:layout_constraintHorizontal_bias="0.879"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/text_view_countdown"-->
-<!--        tools:ignore="HardcodedText"-->
-<!--        tools:visibility="invisible" />-->
-
-    <ImageButton
-        android:id="@+id/imagebutton_pause"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginEnd="15dp"
-        android:background="#0000"
-        android:padding="0dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/pause"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/imagebutton_restart" />
 
     <ImageButton
         android:id="@+id/imagebutton_restart"
@@ -101,18 +38,22 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.622" />
 
-    <!--    <Button-->
-<!--        android:id="@+id/finish"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginStart="15dp"-->
-<!--        android:layout_marginTop="72dp"-->
-<!--        android:text="@string/Finish"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toEndOf="@+id/button_start_pause"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/text_view_countdown"-->
-<!--        tools:ignore="HardcodedText"-->
-<!--        tools:visibility="invisible" />-->
+    <ImageButton
+        android:id="@+id/imagebutton_pause"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:background="#0000"
+        android:padding="0dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/pause"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/imagebutton_restart" />
 
     <ImageButton
         android:id="@+id/imagebutton_reset"
@@ -123,7 +64,7 @@
         android:background="#00000000"
         android:padding="0dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/reset"
+        android:src="@android:drawable/ic_menu_delete"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.265"
@@ -135,8 +76,8 @@
 
     <ImageButton
         android:id="@+id/imagebutton_finish"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="38dp"
+        android:layout_height="39dp"
         android:layout_marginTop="72dp"
         android:layout_marginEnd="15dp"
         android:background="#00000000"
@@ -151,18 +92,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.622" />
-
-    <Button
-        android:id="@+id/button_tran"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="58dp"
-        android:contentDescription="@android:string/unknownName"
-        android:text="Transcribe"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_start_pause"
-        />
 
     <android.support.constraint.Guideline
         android:id="@+id/guideline"
@@ -191,5 +120,15 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_begin="20dp" />
+
+    <ImageView
+        android:id="@+id/image_view"
+        android:layout_width="407dp"
+        android:layout_height="232dp"
+        android:background="#00000000"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="56dp" />
 
 </android.support.constraint.ConstraintLayout>
