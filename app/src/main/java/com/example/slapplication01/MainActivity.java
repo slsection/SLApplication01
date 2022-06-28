@@ -77,7 +77,7 @@ public class MainActivity  extends AppCompatActivity {
         getmButtonReset = findViewById(R.id.imagebutton_reset);
         getmButtonFinish = findViewById(R.id.imagebutton_finish);
         // 初期表示設定
-        mTextViewCountDown.setText("03:00:00");
+        updateCountDownText();
         mButtonPause.setVisibility(View.INVISIBLE);
         getmButtonReset.setVisibility(View.INVISIBLE);
         getmButtonFinish.setVisibility(View.INVISIBLE);
@@ -219,14 +219,6 @@ public class MainActivity  extends AppCompatActivity {
     //--------------------
     // タイマー開始処理
     private void startTimer(){
-        if(mStopTime!=0){
-            // 再開　一時停止時の値
-            mTimeLeftInMillis = mStopTime;
-        }
-        else {
-            // 上記以外　初期値
-            mTimeLeftInMillis = START_TIME;
-        }
         // タイマー生成
         mCountDownTimer = new CountDownTimer(mTimeLeftInMillis,1000) {
             @Override
@@ -260,7 +252,6 @@ public class MainActivity  extends AppCompatActivity {
         mTimeLeftInMillis = mStopTime;
         updateCountDownText();
         startTimer();
-        mCountDownTimer.start();
     }
     // タイマーリセット処理
     private void resetTimer(){
@@ -339,6 +330,9 @@ public class MainActivity  extends AppCompatActivity {
     private void postUpload(){
         // タイマー表示初期化
         resetTimer();
+        // ボタン活性
+        getmButtonReset.setEnabled(true);
+        getmButtonFinish.setEnabled(true);
         // ボタン表示変更
         changeButton(nowStatus);
     }
