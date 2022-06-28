@@ -81,6 +81,7 @@ public class MainActivity  extends AppCompatActivity {
         mButtonPause.setVisibility(View.INVISIBLE);
         getmButtonReset.setVisibility(View.INVISIBLE);
         getmButtonFinish.setVisibility(View.INVISIBLE);
+//        GifWave.setVisibility(View.INVISIBLE);
         // 録音ファイル生成
         audiofile = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), FILENAME);
         // イコライザー画像設定
@@ -281,6 +282,8 @@ public class MainActivity  extends AppCompatActivity {
         switch (p_nowStatus){
             //　起動前、完了、中止の場合
             case IDLE:
+                GifWave.setVisibility(View.VISIBLE);
+                break;
             case COMPLETE:
             case RESET:
 //                mButtonStartPause.setText("START"); // 暫定：ボタンイメージに置き換え後、削除
