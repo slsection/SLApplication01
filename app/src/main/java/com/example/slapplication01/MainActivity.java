@@ -81,7 +81,8 @@ public class MainActivity  extends AppCompatActivity {
         mButtonPause.setVisibility(View.INVISIBLE);
         getmButtonReset.setVisibility(View.INVISIBLE);
         getmButtonFinish.setVisibility(View.INVISIBLE);
-//        GifWave.setVisibility(View.INVISIBLE);
+        GifWave = findViewById(R.id.image_view);
+        GifWave.setVisibility(View.INVISIBLE);
         // 録音ファイル生成
         audiofile = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), FILENAME);
         // イコライザー画像設定
