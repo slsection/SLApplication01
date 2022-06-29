@@ -70,25 +70,25 @@ public class MainActivity  extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Context context = getApplicationContext();
+
         // 画面オブジェクトの関連付け
+        GifWave = findViewById(R.id.image_view);
         mTextViewCountDown = findViewById(R.id.text_view_countdown);
         mButtonStart = findViewById(R.id.imagebutton_restart);
         mButtonPause = findViewById(R.id.imagebutton_pause);
         getmButtonReset = findViewById(R.id.imagebutton_reset);
         getmButtonFinish = findViewById(R.id.imagebutton_finish);
+
         // 初期表示設定
         updateCountDownText();
-        mButtonPause.setVisibility(View.INVISIBLE);
-        getmButtonReset.setVisibility(View.INVISIBLE);
-        getmButtonFinish.setVisibility(View.INVISIBLE);
-        GifWave = findViewById(R.id.image_view);
-        GifWave.setVisibility(View.INVISIBLE);
-        // 録音ファイル生成
-        audiofile = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), FILENAME);
-        // イコライザー画像設定
+        changeButton(nowStatus);
+
+        // イコライザー生成
         ImageView matchImage = findViewById(R.id.image_view);
         GlideDrawableImageViewTarget target = new GlideDrawableImageViewTarget(matchImage);
-        Glide.with(context).load(R.drawable.wave_minion).into(target);
+
+        // 録音ファイル生成
+        audiofile = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), FILENAME);
 
         // 録音許可申請表示
         ActivityCompat.requestPermissions(
@@ -105,11 +105,12 @@ public class MainActivity  extends AppCompatActivity {
                 System.out.println("nowStatus["+nowStatus+"]");
                 if(recorder == null){
                     recorder = new MediaRecorder();
+                    // イコライザー画像設定（初期処理で設定すると一瞬表示されるため）
+                    Glide.with(context).load(R.drawable.wave_minion).into(target);
                 }
                 startPause();
             }
         });
-
 
         // クリックイベント：一時停止
         mButtonPause.setOnClickListener(new View.OnClickListener(){
@@ -282,35 +283,30 @@ public class MainActivity  extends AppCompatActivity {
         switch (p_nowStatus){
             //　起動前、完了、中止の場合
             case IDLE:
-                GifWave.setVisibility(View.VISIBLE);
-                break;
             case COMPLETE:
             case RESET:
-//                mButtonStartPause.setText("START"); // 暫定：ボタンイメージに置き換え後、削除
+                GifWave.setVisibility(View.INVISIBLE);
                 mButtonStart.setVisibility(View.VISIBLE);
                 mButtonPause.setVisibility(View.INVISIBLE);
                 getmButtonReset.setVisibility(View.INVISIBLE);
                 getmButtonFinish.setVisibility(View.INVISIBLE);
-                GifWave.setVisibility(View.INVISIBLE);
                 break;
             // 開始、再開の場合
             case START:
             case RESUME:
-//                mButtonStartPause.setText("PAUSE"); // 暫定：ボタンイメージに置き換え後、削除
+                GifWave.setVisibility(View.VISIBLE);
                 mButtonStart.setVisibility(View.INVISIBLE);
                 mButtonPause.setVisibility(View.VISIBLE);
                 getmButtonReset.setVisibility(View.VISIBLE);
                 getmButtonFinish.setVisibility(View.VISIBLE);
-                GifWave.setVisibility(View.VISIBLE);
                 break;
             // 一時停止の場合
             case PAUSE:
-//                mButtonStartPause.setText("RESTART"); // 暫定：ボタンイメージに置き換え後、削除
+                GifWave.setVisibility(View.INVISIBLE);
                 mButtonStart.setVisibility(View.VISIBLE);
                 mButtonPause.setVisibility(View.INVISIBLE);
                 getmButtonReset.setVisibility(View.VISIBLE);
                 getmButtonFinish.setVisibility(View.VISIBLE);
-                GifWave.setVisibility(View.INVISIBLE);
                 break;
             default:
                 break;
