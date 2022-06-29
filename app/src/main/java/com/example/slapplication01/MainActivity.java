@@ -41,6 +41,7 @@ public class MainActivity  extends AppCompatActivity {
     private  ImageButton getmButtonReset;
     private  ImageButton getmButtonFinish;
     private  CountDownTimer mCountDownTimer;
+    private  ImageView GifWave;
     // タイマー関連
     private static final long START_TIME = 10800000;
     //private static final long START_TIME = 10000; // テスト10秒
@@ -80,12 +81,15 @@ public class MainActivity  extends AppCompatActivity {
         mButtonPause.setVisibility(View.INVISIBLE);
         getmButtonReset.setVisibility(View.INVISIBLE);
         getmButtonFinish.setVisibility(View.INVISIBLE);
+        GifWave = findViewById(R.id.image_view);
+        GifWave.setVisibility(View.INVISIBLE);
         // 録音ファイル生成
         audiofile = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), FILENAME);
         // イコライザー画像設定
+        GifWave = findViewById(R.id.image_view);
         ImageView matchImage = findViewById(R.id.image_view);
-        GlideDrawableImageViewTarget target = new GlideDrawableImageViewTarget(matchImage,1);
-        Glide.with(context).load(R.raw.gif).into(target);
+        GlideDrawableImageViewTarget target = new GlideDrawableImageViewTarget(matchImage);
+        Glide.with(context).load(R.drawable.wave_white).into(target);
 
         // 録音許可申請表示
         ActivityCompat.requestPermissions(
@@ -106,6 +110,7 @@ public class MainActivity  extends AppCompatActivity {
                 startPause();
             }
         });
+
 
         // クリックイベント：一時停止
         mButtonPause.setOnClickListener(new View.OnClickListener(){
@@ -278,6 +283,8 @@ public class MainActivity  extends AppCompatActivity {
         switch (p_nowStatus){
             //　起動前、完了、中止の場合
             case IDLE:
+                GifWave.setVisibility(View.VISIBLE);
+                break;
             case COMPLETE:
             case RESET:
 //                mButtonStartPause.setText("START"); // 暫定：ボタンイメージに置き換え後、削除
@@ -285,6 +292,7 @@ public class MainActivity  extends AppCompatActivity {
                 mButtonPause.setVisibility(View.INVISIBLE);
                 getmButtonReset.setVisibility(View.INVISIBLE);
                 getmButtonFinish.setVisibility(View.INVISIBLE);
+                GifWave.setVisibility(View.INVISIBLE);
                 break;
             // 開始、再開の場合
             case START:
@@ -294,6 +302,7 @@ public class MainActivity  extends AppCompatActivity {
                 mButtonPause.setVisibility(View.VISIBLE);
                 getmButtonReset.setVisibility(View.VISIBLE);
                 getmButtonFinish.setVisibility(View.VISIBLE);
+                GifWave.setVisibility(View.VISIBLE);
                 break;
             // 一時停止の場合
             case PAUSE:
@@ -302,6 +311,7 @@ public class MainActivity  extends AppCompatActivity {
                 mButtonPause.setVisibility(View.INVISIBLE);
                 getmButtonReset.setVisibility(View.VISIBLE);
                 getmButtonFinish.setVisibility(View.VISIBLE);
+                GifWave.setVisibility(View.INVISIBLE);
                 break;
             default:
                 break;
