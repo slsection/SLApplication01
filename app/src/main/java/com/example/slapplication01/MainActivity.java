@@ -86,10 +86,9 @@ public class MainActivity  extends AppCompatActivity {
         // 録音ファイル生成
         audiofile = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), FILENAME);
         // イコライザー画像設定
-        GifWave = findViewById(R.id.image_view);
         ImageView matchImage = findViewById(R.id.image_view);
         GlideDrawableImageViewTarget target = new GlideDrawableImageViewTarget(matchImage);
-        Glide.with(context).load(R.drawable.wave_white).into(target);
+        Glide.with(context).load(R.drawable.wave_minion).into(target);
 
         // 録音許可申請表示
         ActivityCompat.requestPermissions(
