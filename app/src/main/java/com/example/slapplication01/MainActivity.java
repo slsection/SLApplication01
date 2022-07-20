@@ -1,15 +1,20 @@
 package com.example.slapplication01;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -21,7 +26,6 @@ import android.media.MediaRecorder;
 
 //AWS_S3アップロード関連で必要なライブラリ
 import android.util.Log;
-import android.widget.Toast;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.regions.Regions;
@@ -313,6 +317,34 @@ public class MainActivity  extends AppCompatActivity {
         }
     }
     //--------------------
+    // ダイアログ表示
+    //--------------------
+    private void showDialog(String p_strMessage, int p_intY, int p_intTime) {
+        // ダイアログ作成
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+//            builder.setPositiveButton("OK", null);    // （参考）コールバックなし
+//            builder.setNegativeButton("NG", null);    // （参考）同上
+        AlertDialog dialog = builder.create();
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setMessage(p_strMessage);
+        // 表示カスタマイズ
+        WindowManager.LayoutParams wmlp = dialog.getWindow().getAttributes();
+        wmlp.gravity = Gravity.TOP | Gravity.CENTER;
+        wmlp.x = 0;      // x位置
+        wmlp.y = p_intY; // y位置
+        // 自動消去設定
+        Handler handler = new Handler();
+        Runnable dialogDismiss = new Runnable() {
+            public void run() {
+                // ダイアログ削除
+                dialog.dismiss();
+            }
+        };
+        // ダイアログ表示
+        dialog.show();
+        handler.postDelayed(dialogDismiss, p_intTime);
+    }
+    //--------------------
     // ファイル転送制御
     //--------------------
     // 転送前処理
@@ -321,9 +353,9 @@ public class MainActivity  extends AppCompatActivity {
         getmButtonReset.setEnabled(false);
         getmButtonFinish.setEnabled(false);
         // メッセージ表示
-        Toast.makeText(MainActivity.this,
-                "録音終了\n文字起こし開始します",
-                Toast.LENGTH_SHORT).show();
+        showDialog("録音終了\n文字起こしを開始しました\n音声ファイル転送中・・・",
+                300,
+                4000);
     }
     // 転送後処理
     private void postUpload(){
@@ -365,9 +397,9 @@ public class MainActivity  extends AppCompatActivity {
                 Log.d("uploadToS3", "status: " + state);
                 if(state.toString().equals("COMPLETED")){
                     // メッセージ表示
-                    Toast.makeText(MainActivity.this,
-                            "音声ファイル転送完了\n文字起こし完了メールをお待ちください",
-                            Toast.LENGTH_LONG).show();
+                    showDialog("音声ファイル転送完了\n文字起こし完了メールをお待ちください",
+                            600,
+                            5000);
                     // 転送後処理
                     postUpload();
                 }
@@ -383,9 +415,9 @@ public class MainActivity  extends AppCompatActivity {
             public void onError(int id, Exception ex) {
                 ex.printStackTrace();
                 // メッセージ表示
-                Toast.makeText(MainActivity.this,
-                        "音声ファイル転送失敗",
-                        Toast.LENGTH_LONG).show();
+                showDialog("音声ファイル転送失敗",
+                        600,
+                        5000);
                 // 転送後処理
                 postUpload();
             }
