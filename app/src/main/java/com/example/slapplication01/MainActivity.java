@@ -165,6 +165,7 @@ public class MainActivity  extends AppCompatActivity {
                 nowStatus = runState.RESET;
                 // ボタン表示変更
                 changeButton(nowStatus);
+                nowStatus = runState.IDLE;
             }
         });
     }
@@ -366,6 +367,7 @@ public class MainActivity  extends AppCompatActivity {
         getmButtonFinish.setEnabled(true);
         // ボタン表示変更
         changeButton(nowStatus);
+        nowStatus = runState.IDLE;
     }
     // 録音ファイル転送処理
     private void uploadToS3(String p_fileName, String p_path){
@@ -422,5 +424,18 @@ public class MainActivity  extends AppCompatActivity {
                 postUpload();
             }
         });
+    }
+    @Override
+    public void onBackPressed() {
+        if(nowStatus != runState.IDLE){
+            // メッセージ表示
+            showDialog("録音操作中は戻れません\n完了もしくはリセットしてください",
+                    300,
+                    3000);
+        }
+        else {
+            // ログイン画面に戻る
+            finish();
+        }
     }
 }
