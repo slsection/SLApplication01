@@ -3,6 +3,7 @@ package com.example.slapplication01;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
@@ -37,15 +38,15 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 
-public class MainActivity  extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity {
     // 画面オブジェクト
-    private  TextView mTextViewCountDown;
-    private  ImageButton mButtonStart;
-    private  ImageButton mButtonPause;
-    private  ImageButton getmButtonReset;
-    private  ImageButton getmButtonFinish;
-    private  CountDownTimer mCountDownTimer;
-    private  ImageView GifWave;
+    private TextView mTextViewCountDown;
+    private ImageButton mButtonStart;
+    private ImageButton mButtonPause;
+    private ImageButton getmButtonReset;
+    private ImageButton getmButtonFinish;
+    private CountDownTimer mCountDownTimer;
+    private ImageView GifWave;
     // タイマー関連
     private static final long START_TIME = 10800000;
     //private static final long START_TIME = 10000; // テスト10秒
@@ -372,7 +373,11 @@ public class MainActivity  extends AppCompatActivity {
     // 録音ファイル転送処理
     private void uploadToS3(String p_fileName, String p_path){
         // S3関連の設定
-       String bucket = "slaplication01-in";        // バケット名
+        // ログイン画面のユーザーID(=バケット名)取得
+        String mUserID = getIntent().getStringExtra("UserID");
+        // バケット名作成
+        String bucket = "slaplication01-in" + "/" + mUserID;
+        //String bucket = "slaplication01-in";  // AWS側の改修中は旧版を使用、完了後削除
 
         // Amazon Cognito 認証情報プロバイダーを初期化
         CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
