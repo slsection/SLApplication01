@@ -16,6 +16,8 @@ public class StartActivity extends AppCompatActivity {
     private EditText mTextViewUserID;
     private EditText mTextViewPassword;
     private Button mButtonLogin;
+    // メッセージ表示用
+    private MainActivity objMainActivity = new MainActivity();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +37,16 @@ public class StartActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String strUserID = mTextViewUserID.getText().toString();    // ユーザーID
                 String strPassword = mTextViewPassword.getText().toString();// パスワード
+
+                // 入力必須チェック
+                if(strUserID.isEmpty() || strPassword.isEmpty()){
+                    // メッセージ表示
+                    objMainActivity.showDialog(StartActivity.this,
+                            "ユーザーID・パスワードを\n入力してください",
+                            300, 4000);
+                    return;
+                }
+
                 // ユーザー認証処理
                 boolean blRet = userAuthentication(strUserID, strPassword);
                 // ログイン成功
@@ -53,9 +65,9 @@ public class StartActivity extends AppCompatActivity {
                 // ログイン失敗
                 else{
                     // メッセージ表示
-                    Toast.makeText(StartActivity.this,
+                    objMainActivity.showDialog(StartActivity.this,
                             "ログイン失敗\nユーザーIDまたはパスワードが誤っています",
-                            Toast.LENGTH_LONG).show();
+                            300, 4000);
                 }
             }
         });

@@ -321,9 +321,9 @@ public class MainActivity extends AppCompatActivity {
     //--------------------
     // ダイアログ表示
     //--------------------
-    private void showDialog(String p_strMessage, int p_intY, int p_intTime) {
+    public void showDialog( Context p_context, String p_strMessage, int p_intY, int p_intTime) {
         // ダイアログ作成
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(p_context);
 //            builder.setPositiveButton("OK", null);    // （参考）コールバックなし
 //            builder.setNegativeButton("NG", null);    // （参考）同上
         AlertDialog dialog = builder.create();
@@ -355,9 +355,9 @@ public class MainActivity extends AppCompatActivity {
         getmButtonReset.setEnabled(false);
         getmButtonFinish.setEnabled(false);
         // メッセージ表示
-        showDialog("録音終了\n文字起こしを開始しました\n音声ファイル転送中・・・",
-                300,
-                4000);
+        showDialog(MainActivity.this,
+                "録音終了\n文字起こしを開始しました\n音声ファイル転送中・・・",
+                300, 4000);
     }
     // 転送後処理
     private void postUpload(){
@@ -404,9 +404,9 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("uploadToS3", "status: " + state);
                 if(state.toString().equals("COMPLETED")){
                     // メッセージ表示
-                    showDialog("音声ファイル転送完了\n文字起こし完了メールをお待ちください",
-                            600,
-                            5000);
+                    showDialog(MainActivity.this,
+                            "音声ファイル転送完了\n文字起こし完了メールをお待ちください",
+                            600, 5000);
                     // 転送後処理
                     postUpload();
                 }
@@ -422,9 +422,9 @@ public class MainActivity extends AppCompatActivity {
             public void onError(int id, Exception ex) {
                 ex.printStackTrace();
                 // メッセージ表示
-                showDialog("音声ファイル転送失敗",
-                        600,
-                        5000);
+                showDialog(MainActivity.this,
+                        "音声ファイル転送失敗",
+                        600, 5000);
                 // 転送後処理
                 postUpload();
             }
@@ -434,9 +434,9 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
         if(nowStatus != runState.IDLE){
             // メッセージ表示
-            showDialog("録音操作中は戻れません\n完了もしくはリセットしてください",
-                    300,
-                    3000);
+            showDialog(MainActivity.this,
+                    "録音操作中は戻れません\n完了もしくはリセットしてください",
+                    300, 3000);
         }
         else {
             // ログイン画面に戻る
