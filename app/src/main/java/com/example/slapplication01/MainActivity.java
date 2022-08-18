@@ -373,11 +373,11 @@ public class MainActivity extends AppCompatActivity {
     // 録音ファイル転送処理
     private void uploadToS3(String p_fileName, String p_path){
         // S3関連の設定
-        // ログイン画面のユーザーID(=バケット名)取得
-        String mUserID = getIntent().getStringExtra("UserID");
         // バケット名作成
-        String bucket = "slaplication01-in" + "/" + mUserID;
-        //String bucket = "slaplication01-in";  // AWS側の改修中は旧版を使用、完了後削除
+        String bucket = "slaplication01-in";
+        // キー作成（ログイン画面のユーザーID＋録音音声ファイル名）
+        String mUserID = getIntent().getStringExtra("UserID");
+        String key = mUserID + "/" + p_fileName;
 
         // Amazon Cognito 認証情報プロバイダーを初期化
         CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
@@ -393,7 +393,7 @@ public class MainActivity extends AppCompatActivity {
         // ファイルを指定してアップロードを行う
         TransferObserver observer = transferUtility.upload(
                 bucket,
-                p_fileName,
+                key,
                 new java.io.File(p_path));
 
         // コールバック登録
