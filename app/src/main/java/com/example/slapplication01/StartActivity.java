@@ -3,6 +3,7 @@ package com.example.slapplication01;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.StrictMode;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,6 +24,10 @@ public class StartActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
         Context context = getApplicationContext();
 
         // 画面オブジェクトの関連付け
